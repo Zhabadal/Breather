@@ -9,12 +9,18 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    @IBOutlet weak var heightConstraint: NSLayoutConstraint!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
-
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        heightConstraint.constant = view.bounds.height > 622 ? view.bounds.height : 622
+    }
 
 }
 
