@@ -7,9 +7,12 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 class MainViewController: UIViewController {
     
+    // MARK: - Outlets
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var weatherImageView: UIImageView!
@@ -28,11 +31,16 @@ class MainViewController: UIViewController {
     @IBOutlet weak var asthmaRiskLabel: UILabel!
     @IBOutlet weak var asthmaProbabilityLabel: UILabel!
     
-    private let data = CityConditions.sampleData()
-
+    // MARK: - Properties
+    var viewModel = MainViewModel()
+    private let disposeBag = DisposeBag()
+    private let refreshSubject = PublishSubject<Void>()
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateUI()
+        bindViewModel()
+        refresh()
     }
     
     override func viewWillLayoutSubviews() {
@@ -40,42 +48,49 @@ class MainViewController: UIViewController {
         heightConstraint.constant = view.bounds.height > 622 ? view.bounds.height : 622
     }
     
-    @IBAction func aqiStandartSegmentedControlValueChanged(_ sender: UISegmentedControl) {
-        updateAirQualityUI()
-    }
-    
-    private func updateUI() {
-        cityLabel.text = data.city
-        updateWeatherUI()
-        updateAirQualityUI()
-        updateAsthmaUI()
-    }
-    
-    private func updateWeatherUI() {
-        weatherImageView.image = UIImage(named: Asset.forIconCode(data.weather.iconCode))
-        temperatureLabel.text = "\(data.weather.temperature)℃"
-        temperatureLabel.textColor = Color.forTemperature(data.weather.temperature)
-        humidityLabel.text = "Humidity: \(data.weather.humidity)%"
-        pressureLabel.text = "Pressure: \(data.weather.pressure) hPa"
-        windLabel.text = "Wind: \(data.weather.windSpeed) m/s"
-        let rotationAngle = (CGFloat(data.weather.windDirection) * .pi) / 180.0
-        windDirectionImageView.transform = CGAffineTransform(rotationAngle: rotationAngle)
-    }
-    
-    private func updateAirQualityUI() {
-        let standartUS = aqiStandartSegmentedControl.selectedSegmentIndex == 0
+    // MARK: - Methods
+    private func bindViewModel() {
+        // Inputs
+        refreshSubject
+            .subscribe(viewModel.input.viewDidRefresh)
+            .disposed(by: disposeBag)
         
-        airQualityLabel.text = Text.forAQI(standartUS ? data.pollution.aqiUS : data.pollution.aqiChina)
-        airQualityLabel.textColor = Color.forAQI(standartUS ? data.pollution.aqiUS : data.pollution.aqiChina)
-        aqiLabel.text = "AQI: \(standartUS ? data.pollution.aqiUS : data.pollution.aqiChina)"
-        let text = "Main pollutant: \(Text.forMainPollutant(standartUS ? data.pollution.mainPollutantUS : data.pollution.mainPollutantChina))"
-        mainPollutantLabel.setAttributedTextWithSubscripts(text: text, indicesOfSubscripts: text.indicesOfNumbers)
+        aqiStandartSegmentedControl.rx.selectedSegmentIndex
+            .subscribe(viewModel.input.aqiStandard)
+            .disposed(by: disposeBag)
+        
+        // Outputs
+        viewModel.output.city.drive(cityLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.weatherImage.drive(weatherImageView.rx.image).disposed(by: disposeBag)
+        viewModel.output.temperature.drive(temperatureLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.temperatureColor.drive(onNext: { [unowned self] color in
+            self.temperatureLabel.textColor = color
+        }).disposed(by: disposeBag)
+        viewModel.output.humidity.drive(humidityLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.pressure.drive(pressureLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.windSpeed.drive(windLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.windDirection.drive(onNext: { [unowned self] direction in
+            self.windDirectionImageView.transform = CGAffineTransform(rotationAngle: direction)
+        }).disposed(by: disposeBag)
+        viewModel.output.airQuality.drive(airQualityLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.airQualityColor.drive(onNext: { [unowned self] color in
+            self.airQualityLabel.textColor = color
+        }).disposed(by: disposeBag)
+        viewModel.output.aqi.drive(aqiLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.mainPollutant.drive(onNext: { [unowned self] text in
+            self.mainPollutantLabel.setAttributedTextWithSubscripts(
+                text: text,
+                indicesOfSubscripts: text.indicesOfNumbers)
+        }).disposed(by: disposeBag)
+        viewModel.output.asthmaRisk.drive(asthmaRiskLabel.rx.text).disposed(by: disposeBag)
+        viewModel.output.asthmaRiskColor.drive(onNext: { [unowned self] color in
+            self.asthmaRiskLabel.textColor = color
+        }).disposed(by: disposeBag)
+        viewModel.output.asthmaProbability.drive(asthmaProbabilityLabel.rx.text).disposed(by: disposeBag)
     }
     
-    private func updateAsthmaUI() {
-        asthmaRiskLabel.text = data.asthma.risk.capitalized
-        asthmaRiskLabel.textColor = Color.forAsthmaRisk(data.asthma.risk)
-        asthmaProbabilityLabel.text = "Probability: \(data.asthma.probability)%"
+    @objc private func refresh() {
+        refreshSubject.onNext(())
     }
-
+    
 }
