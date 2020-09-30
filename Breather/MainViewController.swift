@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 class MainViewController: UIViewController {
-    
+     
     // MARK: - Outlets
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var cityLabel: UILabel!
