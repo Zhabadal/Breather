@@ -50,11 +50,13 @@ class MainViewModel: ViewModel {
         let asthmaRisk: Driver<String>
         let asthmaRiskColor: Driver<UIColor>
         let asthmaProbability: Driver<String>
+        // Loading
+        let isLoading: Driver<Bool>
     }
     
-    // MARK: - Private properties
     private let cityConditionsSubject = PublishSubject<CityConditions>()
     private let disposeBag = DisposeBag()
+    private let isLoadingSubject = PublishSubject<Bool>()
     
     // MARK: - Initialization
     init() {
@@ -125,10 +127,18 @@ class MainViewModel: ViewModel {
                         mainPollutant: mainPollutant,
                         asthmaRisk: asthmaRisk,
                         asthmaRiskColor: asthmaRiskColor,
-                        asthmaProbability: asthmaProbability)
+                        asthmaProbability: asthmaProbability,
+                        isLoading: isLoadingSubject.asDriver(onErrorJustReturn: false))
         
         viewDidRefreshSubject
+            .do(onNext: { [unowned self] _ in
+                self.isLoadingSubject.onNext(true)
+            })
+            .delay(.seconds(3), scheduler: MainScheduler.instance)
             .map { CityConditions.sampleData() }
+            .do(onNext: { [unowned self] _ in
+                self.isLoadingSubject.onNext(false)
+            })
             .subscribe(onNext: { [unowned self] cityConditions in
                 self.cityConditionsSubject.onNext(cityConditions)
             })

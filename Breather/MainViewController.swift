@@ -31,16 +31,25 @@ class MainViewController: UIViewController {
     @IBOutlet weak var asthmaRiskLabel: UILabel!
     @IBOutlet weak var asthmaProbabilityLabel: UILabel!
     
+    @IBOutlet weak var scrollView: UIScrollView!
+    
     // MARK: - Properties
     var viewModel = MainViewModel()
     private let disposeBag = DisposeBag()
     private let refreshSubject = PublishSubject<Void>()
+    private let refreshControl = UIRefreshControl()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(willEnterForeground),
+                                               name: UIApplication.didBecomeActiveNotification,
+                                               object: nil)
+        
         bindViewModel()
-        refresh()
+        setupRefreshControl()
     }
     
     override func viewWillLayoutSubviews() {
@@ -87,10 +96,30 @@ class MainViewController: UIViewController {
             self.asthmaRiskLabel.textColor = color
         }).disposed(by: disposeBag)
         viewModel.output.asthmaProbability.drive(asthmaProbabilityLabel.rx.text).disposed(by: disposeBag)
+        
+        viewModel.output.isLoading.drive(onNext: { [unowned self] isLoading in
+            self.showLoadingIndicators(force: isLoading)
+        }).disposed(by: disposeBag)
     }
     
     @objc private func refresh() {
         refreshSubject.onNext(())
+    }
+    
+    @objc private func willEnterForeground() {
+        refresh()
+    }
+    
+    private func setupRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        scrollView.refreshControl = refreshControl
+    }
+    
+    private func showLoadingIndicators(force: Bool) {
+        //UIApplication.shared.isNetworkActivityIndicatorVisible = force
+        if !force {
+            refreshControl.endRefreshing()
+        }
     }
     
 }
