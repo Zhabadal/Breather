@@ -3,12 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		51F02F6ECE244E78E96BE245 /* Pods_Breather.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B639E3BBAECA8DC986FC9928 /* Pods_Breather.framework */; };
 		EEA0A246252238B1002AEE39 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA0A245252238B1002AEE39 /* MainViewModel.swift */; };
+		EEF062DB25250ADC009410F1 /* AirVisualAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF062DA25250ADC009410F1 /* AirVisualAPI.swift */; };
+		EEF062DD252519C1009410F1 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF062DC252519C1009410F1 /* Errors.swift */; };
+		EEF062DF25251B8D009410F1 /* UIViewController+Extenstion.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF062DE25251B8D009410F1 /* UIViewController+Extenstion.swift */; };
 		EEF50EAC251D353E0087734D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF50EAB251D353E0087734D /* AppDelegate.swift */; };
 		EEF50EAE251D353E0087734D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF50EAD251D353E0087734D /* SceneDelegate.swift */; };
 		EEF50EB3251D353E0087734D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EEF50EB1251D353E0087734D /* Main.storyboard */; };
@@ -27,6 +30,9 @@
 		77103E28496032727FF8337A /* Pods-Breather.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Breather.debug.xcconfig"; path = "Target Support Files/Pods-Breather/Pods-Breather.debug.xcconfig"; sourceTree = "<group>"; };
 		B639E3BBAECA8DC986FC9928 /* Pods_Breather.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Breather.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEA0A245252238B1002AEE39 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		EEF062DA25250ADC009410F1 /* AirVisualAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirVisualAPI.swift; sourceTree = "<group>"; };
+		EEF062DC252519C1009410F1 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		EEF062DE25251B8D009410F1 /* UIViewController+Extenstion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extenstion.swift"; sourceTree = "<group>"; };
 		EEF50EA8251D353E0087734D /* Breather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Breather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EEF50EAB251D353E0087734D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EEF50EAD251D353E0087734D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,7 +68,6 @@
 				77103E28496032727FF8337A /* Pods-Breather.debug.xcconfig */,
 				FCEAF4601EB93BF5315B8416 /* Pods-Breather.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -97,6 +102,7 @@
 			children = (
 				EEF50EC1251DB7F50087734D /* MainViewController.swift */,
 				EEA0A245252238B1002AEE39 /* MainViewModel.swift */,
+				EEF062DA25250ADC009410F1 /* AirVisualAPI.swift */,
 				EEF50EBF251DB5830087734D /* Models.swift */,
 				EEF50EB1251D353E0087734D /* Main.storyboard */,
 				EEF50EB6251D35420087734D /* LaunchScreen.storyboard */,
@@ -124,6 +130,7 @@
 				EEF50EC4251DE0C40087734D /* Asset.swift */,
 				EEF50EC6251DE12E0087734D /* Color.swift */,
 				EEF50EC8251DE1860087734D /* Text.swift */,
+				EEF062DC252519C1009410F1 /* Errors.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -133,6 +140,7 @@
 			children = (
 				EEF50ECC251DE9290087734D /* UILabel+Extension.swift */,
 				EEF50ECE251DE9760087734D /* String+Extension.swift */,
+				EEF062DE25251B8D009410F1 /* UIViewController+Extenstion.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -252,9 +260,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EEF062DB25250ADC009410F1 /* AirVisualAPI.swift in Sources */,
 				EEF50ECD251DE9290087734D /* UILabel+Extension.swift in Sources */,
+				EEF062DF25251B8D009410F1 /* UIViewController+Extenstion.swift in Sources */,
 				EEF50ECF251DE9760087734D /* String+Extension.swift in Sources */,
 				EEF50EAC251D353E0087734D /* AppDelegate.swift in Sources */,
+				EEF062DD252519C1009410F1 /* Errors.swift in Sources */,
 				EEF50EAE251D353E0087734D /* SceneDelegate.swift in Sources */,
 				EEF50EC5251DE0C40087734D /* Asset.swift in Sources */,
 				EEA0A246252238B1002AEE39 /* MainViewModel.swift in Sources */,

@@ -8,5 +8,6 @@ target 'Breather' do
   # Pods for Breather
   pod 'RxSwift', '~> 5'
   pod 'RxCocoa', '~> 5'
+  pod 'Moya/RxSwift', '~> 14.0'
 
 end

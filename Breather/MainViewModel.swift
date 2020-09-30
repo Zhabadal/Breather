@@ -9,6 +9,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import Moya
 
 protocol ViewModel {
     associatedtype Input
@@ -19,6 +20,11 @@ protocol ViewModel {
 }
 
 class MainViewModel: ViewModel {
+    
+    // MARK: - Dependencies
+    let provider = MoyaProvider<AirVisualAPI>()
+    let lat = 40.676906
+    let lon = -73.942275
     
     // MARK: - Inputs
     let input: Input
@@ -52,11 +58,15 @@ class MainViewModel: ViewModel {
         let asthmaProbability: Driver<String>
         // Loading
         let isLoading: Driver<Bool>
+        // Error
+        let error: Driver<Error>
     }
     
     private let cityConditionsSubject = PublishSubject<CityConditions>()
     private let disposeBag = DisposeBag()
+    
     private let isLoadingSubject = PublishSubject<Bool>()
+    private let errorSubject = PublishSubject<Error>()
     
     // MARK: - Initialization
     init() {
@@ -128,22 +138,29 @@ class MainViewModel: ViewModel {
                         asthmaRisk: asthmaRisk,
                         asthmaRiskColor: asthmaRiskColor,
                         asthmaProbability: asthmaProbability,
-                        isLoading: isLoadingSubject.asDriver(onErrorJustReturn: false))
+                        isLoading: isLoadingSubject.asDriver(onErrorJustReturn: false),
+                        error: errorSubject.asDriver(onErrorJustReturn: BreatherError.unknown))
         
         viewDidRefreshSubject
             .do(onNext: { [unowned self] _ in
                 self.isLoadingSubject.onNext(true)
             })
-            .delay(.seconds(3), scheduler: MainScheduler.instance)
-            .map { CityConditions.sampleData() }
+            .flatMap { [unowned self] _ in
+                return self.provider.rx.request(.nearestCity(lat: self.lat, lon: self.lon))
+                .asObservable()
+                .materialize()
+            }
             .do(onNext: { [unowned self] _ in
                 self.isLoadingSubject.onNext(false)
             })
-            .subscribe(onNext: { [unowned self] cityConditions in
-                self.cityConditionsSubject.onNext(cityConditions)
+            .subscribe(onNext: { [unowned self] event in
+                switch event {
+                case let .next(element): print("next:", element)
+                case let .error(error): self.errorSubject.onNext(error)
+                case .completed: break
+                }
             })
             .disposed(by: disposeBag)
-
     }
     
 }

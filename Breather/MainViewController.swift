@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 class MainViewController: UIViewController {
-     
+    
     // MARK: - Outlets
     @IBOutlet weak var heightConstraint: NSLayoutConstraint!
     @IBOutlet weak var cityLabel: UILabel!
@@ -97,8 +97,14 @@ class MainViewController: UIViewController {
         }).disposed(by: disposeBag)
         viewModel.output.asthmaProbability.drive(asthmaProbabilityLabel.rx.text).disposed(by: disposeBag)
         
+        // Loading
         viewModel.output.isLoading.drive(onNext: { [unowned self] isLoading in
             self.showLoadingIndicators(force: isLoading)
+        }).disposed(by: disposeBag)
+        
+        // Error
+        viewModel.output.error.drive(onNext: { [unowned self] error in
+            self.showAlert(title: "Error", message: error.localizedDescription)
         }).disposed(by: disposeBag)
     }
     
